@@ -79,36 +79,19 @@ class FastMCP:
 
 # Initialize FastMCP server
 mcp = FastMCP("brand")
-
+from .brandzero_workflow import (
+    run_workflow, BrandAnalysisResult, TransformationState
+)
 @mcp.tool()
 async def get_brand(command: str) -> str:
     """Get brand analytics and competitive information.
     
     command: The brand name to analyze
     """
-    mock_data = {
-        "brand_score": 87.5,
-        "visibility_rank": 12,
-        "market_share": "23.4%",
-        "social_media_presence": {
-            "followers": "2.4M",
-            "engagement_rate": "4.2%",
-            "sentiment": "Positive (78%)"
-        },
-        "competitors": [
-            {"name": "Competitor A", "market_share": "18.7%", "brand_score": 82.1},
-            {"name": "Competitor B", "market_share": "15.2%", "brand_score": 79.8},
-            {"name": "Competitor C", "market_share": "12.9%", "brand_score": 75.4}
-        ],
-        "key_metrics": {
-            "brand_awareness": "92%",
-            "customer_satisfaction": "4.6/5",
-            "brand_loyalty": "High",
-            "market_growth": "+15.3% YoY"
-        }
-    }
+    result: BrandAnalysisResult = run_workflow(brand_or_product=command)
     
-    return f"""
+    return result.model_dump() if result else {}
+f"""
 Brand Analytics Report:
 ---------------------
 Brand Score: {mock_data['brand_score']}/100

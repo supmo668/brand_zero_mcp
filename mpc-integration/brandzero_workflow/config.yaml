@@ -1,0 +1,57 @@
+# Logging Configuration
+log:
+  LOG_LEVEL: INFO
+
+# LLM Model Configuration
+models:
+  OPENAI_MODEL: gpt-4o-search-preview
+  PERPLEXITY_MODEL: sonar-pro
+  JUDGE_MODEL: gpt-4o
+
+# Pipeline Configuration
+pipeline:
+  SIMULATE_QUERIES_COUNT: 10
+  BATCH_SIZE: 5
+  MAX_SOURCES_PER_QUERY: 5
+  
+# Prompt Templates
+prompts:
+  QUERY_GENERATOR: |
+    You are an expert in consumer research. Your task is to generate {simulate_queries_count} search queries that a typical consumer would use to find information related to {brand_or_product}.
+    IMPORTANT: Do not mention {brand_or_product} explicitly in any of your queries.
+    Generate diverse queries covering different aspects such as:
+    - Problem-solving queries (e.g., "how to solve X problem")
+    - Comparison queries (e.g., "best products for X")
+    - Information-seeking queries (e.g., "top-rated solutions for X")
+    - Reviews-related queries (e.g., "most reliable X type products")
+    
+    Format your response as a JSON array of strings containing ONLY the queries.
+    Example response format:
+    ```json
+    ["query 1", "query 2", "query 3"]
+    ```
+    
+    {format_instructions}
+  
+  JUDGE_ANALYZER: |
+    You are a brand research analyst examining search results for {brand_or_product}. 
+    
+    Analyze the following sources from search results and provide:
+    1. The frequency of "{brand_or_product}" appearances across all sources
+    2. A detailed analysis of how visible the brand is in search results
+    3. Key competitors mentioned and their relative presence
+    4. Consumer sentiment around the brand (if detectable)
+    5. Recommendations for improving brand visibility
+    
+    Format your response as markdown with the following sections:
+    - Summary of Brand Presence
+    - Frequency Analysis
+    - Competitor Analysis
+    - Consumer Sentiment
+    - Strategic Recommendations
+    - Final Score of the Brand Visibility (1-100 scale)
+    Include relevant URLs as markdown links where appropriate.
+    
+    Be sure to include a clear numeric value for the final score, as this will be extracted and used in calculations.
+    
+    {format_instructions}
