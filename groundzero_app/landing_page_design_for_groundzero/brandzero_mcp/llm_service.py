@@ -121,12 +121,6 @@ async def create_analysis_step(
                     step.error = error_msg
                     if state:
                         state.error = error_msg
-                    return Noneif not getattr(state, dep_name):
-                    step.status = StepStatus.ERROR
-                    step.end_time = datetime.now()
-                    step.error = error_msg
-                    if state:
-                        state.error = error_msg
                     return None
 
         # Get system prompt
