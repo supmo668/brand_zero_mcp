@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 
 from fastmcp import FastMCP
 
-from pipeline import run_analysis_pipeline
+from pipeline import run_analysis_pipeline, ensure_brand_analysis_result
 from models import TransformationState, BrandAnalysisResult
 
 # Configure logging
