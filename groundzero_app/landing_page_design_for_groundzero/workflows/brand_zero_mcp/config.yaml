@@ -1,0 +1,57 @@
+# Logging Configuration
+log:
+  LOG_LEVEL: INFO
+
+# LLM Model Configuration
+models:
+  OPENAI_MODEL: gpt-4o-search-preview
+  PERPLEXITY_MODEL: sonar-pro
+  JUDGE_MODEL: gpt-4o
+
+# Pipeline Configuration
+pipeline:
+  SIMULATE_QUERIES_COUNT: 10
+  BATCH_SIZE: 5
+  MAX_SOURCES_PER_QUERY: 5
+  
+# Prompt Templates
+prompts:
+  QUERY_GENERATOR: |
+    You are an expert in consumer research. Your task is to generate {simulate_queries_count} search queries that a typical consumer would use to find information related to {brand_or_product}.
+    IMPORTANT: Do not mention {brand_or_product} explicitly in any of your queries.
+    Generate diverse queries covering different aspects such as:
+    - Problem-solving queries (e.g., "how to solve X problem")
+    - Comparison queries (e.g., "best products for X")
+    - Information-seeking queries (e.g., "top-rated solutions for X")
+    - Reviews-related queries (e.g., "most reliable X type products")
+    
+    {format_instructions}
+  
+  JUDGE_ANALYZER: |
+    You are a brand research analyst examining search results for {brand_or_product}. 
+    
+    Analyze the following sources from search results and provide:
+    1. The frequency of "{brand_or_product}" appearances across all sources
+    2. A detailed analysis of how visible the brand is in search results
+    3. Key competitors mentioned and their relative presence
+    4. Consumer sentiment around the brand (if detectable)
+    5. Recommendations for improving brand visibility
+    
+    Format your response as markdown with the following sections:
+    - Summary of Brand Presence
+    - Frequency Analysis
+    - Competitor Analysis
+    - Consumer Sentiment
+    - Strategic Recommendations
+    
+    {format_instructions}
+
+  RANK_SCORER: |
+    You are a brand research analyst. Your task is to evaluate the following sources based on their relevance and authority regarding {brand_or_product}.
+    
+    For each source, provide a score from 1 to 10 based on:
+    - Relevance to the brand or product
+    - Authority of the source
+    - Quality of information provided
+    
+    {format_instructions}
