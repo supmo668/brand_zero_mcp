@@ -70,7 +70,7 @@ async def run_workflow(brand_or_product: str, output_file: str = None, verbose: 
 
         # Print analysis results
         analysis_result = None
-        if state.analysis_result:
+        if state:
             analysis_result = ensure_brand_analysis_result(state)
             print("\nAnalysis Results:")
             print("=" * 50)
