@@ -1,0 +1,9 @@
+setup.py
+uagent_mcp/__init__.py
+uagent_mcp/fastmcp_adapter.py
+uagent_mcp/protocol.py
+uagent_mcp.egg-info/PKG-INFO
+uagent_mcp.egg-info/SOURCES.txt
+uagent_mcp.egg-info/dependency_links.txt
+uagent_mcp.egg-info/requires.txt
+uagent_mcp.egg-info/top_level.txt
