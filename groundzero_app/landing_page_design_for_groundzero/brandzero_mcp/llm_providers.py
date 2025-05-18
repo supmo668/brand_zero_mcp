@@ -38,8 +38,8 @@ class OpenAISearchProvider(BaseSearchProvider):
         
         self.llm = ChatOpenAI(
             model=self.model_name,
-            openai_api_key=self.api_key,
-            temperature=0.0
+            openai_api_key=self.api_key
+            # temperature=0.0
         )
         logger.info(f"Initialized OpenAI search provider with model {self.model_name}")
         

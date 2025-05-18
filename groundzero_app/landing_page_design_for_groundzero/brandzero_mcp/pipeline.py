@@ -132,7 +132,7 @@ async def analyze_results(
     brand_or_product: str, 
     search_results: List[SearchResult], 
     state: TransformationState
-) -> Optional[BrandAnalysisResult]:
+) -> BrandAnalysisResult:
     """
     Analyze search results to check brand presence.
     
@@ -156,7 +156,8 @@ async def analyze_results(
         all_sources.extend(sources)
     
     # Format sources for prompt
-    formatted_sources = format_sources_for_prompt(all_sources)
+    formatted_sources = format_sources_for_prompt(all_sources)    # Create a parser for BrandAnalysisResult
+    parser = PydanticOutputParser(pydantic_object=BrandAnalysisResult)
     
     # Call LLM to analyze sources
     result = await create_analysis_step(
@@ -165,30 +166,44 @@ async def analyze_results(
         prompt_key="JUDGE_ANALYZER",
         input_variables={
             "brand_or_product": brand_or_product,
-            "sources": formatted_sources
+            "sources": formatted_sources,
+            "format_instructions": parser.get_format_instructions()  # Provide format instructions
         },
-        parser=None  # No parser for now, we'll get raw markdown
+        parser=parser  # Use the parser
     )
     
     if not result:
         logger.error("Failed to analyze results")
-        return None
-    # Create analysis result
-    # Note: The actual fields would need to be extracted from the markdown
-    # For now, we'll create a placeholder with the raw result
-    analysis_result = BrandAnalysisResult(
-        brand_name=brand_or_product,
-        frequency=0,  # This would need to be extracted from the response
-        summary=result,
-        presence_score=0,  # This would need to be extracted from the response
-        competitors=[],
-        sentiment="",
-        recommendations=[]
-    )
+        return None    # The result should now be a proper BrandAnalysisResult object
+    if isinstance(result, BrandAnalysisResult):
+        # Already a BrandAnalysisResult object from the parser
+        analysis_result = result
+    elif isinstance(result, str):
+        # Create analysis result from text
+        analysis_result = BrandAnalysisResult(
+            brand_name=brand_or_product,
+            frequency=0,  # This would need to be extracted from the response
+            summary=result,
+            presence_score=0,  # This would need to be extracted from the response
+            competitors=[],
+            sentiment="",
+            recommendations=[]
+        )
+    else:
+        # Handle any other type of result
+        analysis_result = BrandAnalysisResult(
+            brand_name=brand_or_product,
+            frequency=0,
+            summary=str(result) if result is not None else "",
+            presence_score=0,
+            competitors=[],
+            sentiment="",
+            recommendations=[]
+        )
     
     return analysis_result
 
-async def run_analysis_pipeline(brand_or_product: str) -> TransformationState:
+async def run_analysis_pipeline(brand_or_product: str) -> BrandAnalysisResult:
     """
     Run the complete analysis pipeline.
     
@@ -223,7 +238,7 @@ async def run_analysis_pipeline(brand_or_product: str) -> TransformationState:
         logger.info(f"Completed {len(search_results)} searches")
         
         # Step 3: Analyze results
-        analysis_result = await analyze_results(brand_or_product, search_results, state)
+        analysis_result: BrandAnalysisResult = await analyze_results(brand_or_product, search_results, state)
         if not analysis_result:
             state.error = "Failed to analyze results"
             return state
@@ -231,7 +246,7 @@ async def run_analysis_pipeline(brand_or_product: str) -> TransformationState:
         state.analysis_result = analysis_result
         logger.info("Completed analysis")
         
-        return state
+        return BrandAnalysisResult(**analysis_result)
         
     except Exception as e:
         logger.error(f"Error in analysis pipeline: {str(e)}")

@@ -10,7 +10,9 @@ import logging
 logger = logging.getLogger("brand_zero.utils")
 
 # Load configuration
-with open("config.yaml", "r") as f:
+import os
+config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.yaml")
+with open(config_path, "r") as f:
     CONFIG = yaml.safe_load(f)
 
 def extract_json_from_text(text: str) -> Tuple[Optional[Dict[str, Any]], str]:

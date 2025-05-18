@@ -20,7 +20,7 @@ logger = logging.getLogger("brand_zero.workflow")
 
 # Import local modules
 from pipeline import run_analysis_pipeline
-from models import TransformationState
+from models import TransformationState, BrandAnalysisResult
 
 def format_simulated_queries(state: TransformationState) -> str:
     """Format simulated queries for display."""
@@ -64,49 +64,17 @@ async def run_workflow(brand_or_product: str, output_file: str = None, verbose: 
         logger.info(f"Starting brand presence analysis for '{brand_or_product}'")
         
         # Run the analysis pipeline
-        state = await run_analysis_pipeline(brand_or_product)
+        result: BrandAnalysisResult = await run_analysis_pipeline(brand_or_product)
         
-        # Check for errors
-        if state.error:
-            logger.error(f"Error in analysis: {state.error}")
-            return
-        
-        # Print simulated queries if verbose
-        if verbose:
-            print("\n" + format_simulated_queries(state))
-            print("\n" + format_search_results(state))
-        
-        # Print analysis results
-        if state.analysis_result:
-            print("\nAnalysis Results:")
-            print("=" * 50)
-            print(state.analysis_result.summary)
-            print("=" * 50)
-        else:
-            logger.warning("No analysis results available")
-        
-        # Save results to file if specified
+
         if output_file:
             # Prepare data for serialization
-            output_data = {
-                "brand_or_product": state.brand_or_product,
-                "simulated_queries": [query.query for query in state.simulated_queries],
-                "search_results": [
-                    {
-                        "query": result.query,
-                        "provider": result.provider,
-                        "content": result.content,
-                        "sources": result.sources
-                    }
-                    for result in state.search_results
-                ],
-                "analysis_summary": state.analysis_result.summary if state.analysis_result else None,
-            }
-            
+            output_data = result.model_dump_json()
             with open(output_file, 'w', encoding='utf-8') as f:
                 json.dump(output_data, f, indent=2, ensure_ascii=False)
             
             logger.info(f"Results saved to {output_file}")
+        return result
     
     except Exception as e:
         logger.error(f"Error running workflow: {e}")
@@ -128,7 +96,7 @@ def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description="Run brand presence analysis workflow")
     parser.add_argument("brand", type=str, help="Brand or product name to analyze")
-    parser.add_argument("-o", "--output", type=str, help="Output file for results (JSON format)")
+    parser.add_argument("-o", "--output", type=str, default="result.json", help="Output file for results (JSON format)")
     parser.add_argument("-v", "--verbose", action="store_true", help="Print verbose output")
     
     args = parser.parse_args()

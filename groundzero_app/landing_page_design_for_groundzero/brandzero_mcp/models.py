@@ -50,19 +50,43 @@ class BrandAnalysisResult(BaseModel):
         description="List of competitor brands found in search results with their relative presence."
     )
     sentiment: str = Field(
+        default="",
         description="Overall consumer sentiment about the brand (positive, negative, neutral, or mixed)."
     )
     recommendations: List[str] = Field(
         default_factory=list,
         description="Strategic recommendations for improving brand visibility and presence."
     )
+    
+    def model_dump_json(self, **kwargs) -> str:
+        """Custom method to ensure proper JSON serialization."""
+        return super().model_dump_json(**kwargs)
+        
+    @classmethod
+    def parse_raw(cls, json_str: str) -> "BrandAnalysisResult":
+        """Parse from raw JSON string."""
+        return cls.model_validate_json(json_str)
 
 class TransformationState(BaseModel):
     """State object for the reformulation process."""
     brand_or_product: str
+    score: int = Field(default=0, ge=0, le=100, description="Score indicating the quality of the analysis.")
     simulated_queries: List[SimulatedQuery] = Field(default_factory=list)
     search_results: List[SearchResult] = Field(default_factory=list)
     analysis_result: Optional[BrandAnalysisResult] = None
     intermediate_steps: List[IntermediateStep] = Field(default_factory=list)
     context: Dict[str, List[str]] = Field(default_factory=dict)
     error: Optional[str] = None
+    
+    def model_dump(self, **kwargs) -> Dict[str, Any]:
+        """Custom method to ensure proper serialization."""
+        return super().model_dump(**kwargs)
+    
+    def model_dump_json(self, **kwargs) -> str:
+        """Custom method to ensure proper JSON serialization."""
+        return super().model_dump_json(**kwargs)
+        
+    @classmethod
+    def parse_raw(cls, json_str: str) -> "TransformationState":
+        """Parse from raw JSON string."""
+        return cls.model_validate_json(json_str)

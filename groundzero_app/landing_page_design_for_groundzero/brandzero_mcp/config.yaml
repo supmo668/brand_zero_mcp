@@ -25,7 +25,13 @@ prompts:
     - Information-seeking queries (e.g., "top-rated solutions for X")
     - Reviews-related queries (e.g., "most reliable X type products")
     
-    Format your response as a JSON array of strings.
+    Format your response as a JSON array of strings containing ONLY the queries.
+    Example response format:
+    ```json
+    ["query 1", "query 2", "query 3"]
+    ```
+    
+    {format_instructions}
   
   JUDGE_ANALYZER: |
     You are a brand research analyst examining search results for {brand_or_product}. 
@@ -43,5 +49,9 @@ prompts:
     - Competitor Analysis
     - Consumer Sentiment
     - Strategic Recommendations
-    
+    - Final Score of the Brand Visibility (1-100 scale)
     Include relevant URLs as markdown links where appropriate.
+    
+    Be sure to include a clear numeric value for the final score, as this will be extracted and used in calculations.
+    
+    {format_instructions}
