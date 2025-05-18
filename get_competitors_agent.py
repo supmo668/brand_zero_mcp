@@ -10,14 +10,14 @@ import asyncio
 import pandas as pd
 
 from openai import OpenAI
-from prompts import RESPONSE_AGENT, EXTRACTION_AGENT
+from brand_zero_mcp.get_competitor_prompts import RESPONSE_AGENT, EXTRACTION_AGENT
 
 from firecrawl import AsyncFirecrawlApp
 
 # Replace with your actual API keys in environment variables
-os.environ["OPENAI_API_KEY"] = "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"
-os.environ["PERPLEXITY_API_KEY"] = "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"
-os.environ["FIRECRAWL_API_KEY"] = "fc-5bd5569a04e844279c994c450e8bd7d5"
+os.environ["OPENAI_API_KEY"] = ""
+os.environ["PERPLEXITY_API_KEY"] = ""
+os.environ["FIRECRAWL_API_KEY"] = ""
 
 def make_perplexity_api_call(query, system_prompt, model_name) -> dict:
     client = OpenAI(api_key=os.getenv("PERPLEXITY_API_KEY"), base_url="https://api.perplexity.ai")
