@@ -14,10 +14,7 @@ from brand_zero_mcp.get_competitor_prompts import RESPONSE_AGENT, EXTRACTION_AGE
 
 from firecrawl import AsyncFirecrawlApp
 
-# Replace with your actual API keys in environment variables
-# os.environ["OPENAI_API_KEY"] = ""
-# os.environ["PERPLEXITY_API_KEY"] = ""
-# os.environ["FIRECRAWL_API_KEY"] = ""
+# TODO: Add your OpenAI, Firecrawl API and Perplexity API keys to your environment variables
 
 def make_perplexity_api_call(query, system_prompt, model_name) -> dict:
     client = OpenAI(api_key=os.getenv("PERPLEXITY_API_KEY"), base_url="https://api.perplexity.ai")
@@ -173,7 +170,7 @@ async def main():
             # Extract relevant information from the result
             urls = extract_urls_from_response(result, llm)
 
-            # TODO: Now we scrape these URL pages and extract competitor information
+            # Now we scrape these URL pages and extract competitor information
             print("Extracted URLs:")
             for url in urls:
                 print(f"Title: {url['title']}, URL: {url['url']}")
