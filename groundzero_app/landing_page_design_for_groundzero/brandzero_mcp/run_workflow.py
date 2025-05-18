@@ -69,7 +69,7 @@ async def run_workflow(brand_or_product: str, output_file: str = None, verbose: 
 
         if output_file:
             # Prepare data for serialization
-            output_data = result.model_dump_json()
+            output_data = result.model_dump()
             with open(output_file, 'w', encoding='utf-8') as f:
                 json.dump(output_data, f, indent=2, ensure_ascii=False)
             
