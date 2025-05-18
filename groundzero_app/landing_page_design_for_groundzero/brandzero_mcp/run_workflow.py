@@ -8,7 +8,7 @@ import os
 import asyncio
 import argparse
 import logging
-import json
+from typing import Optional
 from dotenv import load_dotenv
 
 # Configure logging
@@ -51,13 +51,13 @@ def format_search_results(state: TransformationState) -> str:
             f"- Search Providers: {', '.join(providers)}\n"
             f"- Total Sources: {source_count}\n")
 
-async def run_workflow(brand_or_product: str, output_file: str = None, verbose: bool = False) -> BrandAnalysisResult | None:
+async def run_workflow(brand_or_product: str, output_file: str = None, verbose: bool = False) -> Optional[BrandAnalysisResult]:
     """
     Run the brand presence analysis workflow and return a BrandAnalysisResult.
     """
     try:
-        logger.info(f"Starting brand presence analysis for '{brand_or_product}'")
-        state: TransformationState | dict = await run_analysis_pipeline(brand_or_product)
+        logger.info("Starting brand presence analysis for '%s'", brand_or_product)
+        state = await run_analysis_pipeline(brand_or_product)
 
         # If state is a dict (LangGraph), convert to TransformationState
         if isinstance(state, dict):
@@ -65,7 +65,7 @@ async def run_workflow(brand_or_product: str, output_file: str = None, verbose: 
 
         # Check for errors
         if state.error:
-            logger.error(f"Error in analysis: {state.error}")
+            logger.error("Error in analysis: %s", state.error)
             return None
 
         # Print simulated queries if verbose
@@ -74,10 +74,8 @@ async def run_workflow(brand_or_product: str, output_file: str = None, verbose: 
             print("\n" + format_search_results(state))
 
         # Print analysis results
-        analysis_result: BrandAnalysisResult | None = None
+        analysis_result = None
         if state.analysis_result:
-            # If it's a dict, convert to BrandAnalysisResult
-            # analysis_result = BrandAnalysisResult(**state.analysis_result)
             analysis_result = ensure_brand_analysis_result(state.analysis_result)
             print("\nAnalysis Results:")
             print("=" * 50)
@@ -91,10 +89,10 @@ async def run_workflow(brand_or_product: str, output_file: str = None, verbose: 
         if output_file:
             with open(output_file, 'w', encoding='utf-8') as f:
                 f.write(analysis_result.model_dump_json(indent=2, ensure_ascii=False))
-            logger.info(f"Results saved to {output_file}")
+            logger.info("Results saved to %s", output_file)
         return analysis_result
     except Exception as e:
-        logger.error(f"Error running workflow: {e}")
+        logger.error("Error running workflow: %s", e)
         raise
 
 def main():

@@ -1,20 +1,17 @@
 """
 Brand Zero MCP server for brand presence research.
 """
-import os
 from dotenv import load_dotenv
 load_dotenv()
 
 import logging
 import json
-from typing import List, Optional, Dict, Any
 import asyncio
-from pydantic import BaseModel, Field
 
 from fastmcp import FastMCP
 
 from pipeline import run_analysis_pipeline, ensure_brand_analysis_result
-from models import TransformationState, BrandAnalysisResult
+from models import TransformationState
 
 # Configure logging
 logging.basicConfig(
@@ -27,7 +24,7 @@ logger = logging.getLogger("brand_zero.server")
 app = FastMCP("Brand Zero Presence Analyzer")
 
 @app.tool()
-async def analyze_brand_presence(brand_or_product: str) -> Dict[str, Any]:
+async def analyze_brand_presence(brand_or_product: str) -> dict:
     """
     Analyze the online presence of a brand or product.
     
@@ -40,32 +37,26 @@ async def analyze_brand_presence(brand_or_product: str) -> Dict[str, Any]:
     Returns:
         Analysis of the brand's online presence with recommendations
     """
-    logger.info(f"Received brand presence analysis request for: {brand_or_product}")
+    logger.info("Received brand presence analysis request for: %s", brand_or_product)
     
     # Run the analysis pipeline
-    state: TransformationState = await run_analysis_pipeline(brand_or_product)
+    state = await run_analysis_pipeline(brand_or_product)
     
     # Prepare simulated queries list for the response
     simulated_queries = [q.query for q in state.simulated_queries]
     
     # Check if there was an error
     if state.error:
-        return TransformationState(**{
-            "status": "error",
-            "brand_or_product": brand_or_product,
-            "simulated_queries": simulated_queries,
-            "analysis_summary": None,
-            "error": state.error
-        })
-    
-    # Prepare analysis summary
-    analysis_summary = state.analysis_result.summary if state.analysis_result else "No analysis available"
-    
-    # Get presence score
-    presence_score = state.analysis_result.presence_score if state.analysis_result else 0
+        return TransformationState(
+            status="error",
+            brand_or_product=brand_or_product,
+            simulated_queries=simulated_queries,
+            analysis_summary=None,
+            error=state.error
+        ).model_dump()
     
     # Return final response
-    return ensure_brand_analysis_result(state.analysis_result)
+    return ensure_brand_analysis_result(state.analysis_result).model_dump()
 
 # CLI test runner for local dev/demo
 if __name__ == "__main__":
@@ -79,7 +70,7 @@ if __name__ == "__main__":
     
     if args.serve:
         # Start the FastMCP server using the correct syntax
-        logger.info(f"Starting Brand Zero MCP server on port {args.port}")
+        logger.info("Starting Brand Zero MCP server on port %d", args.port)
         app.run(transport="sse", host="127.0.0.1", port=args.port)
     elif args.brand:
         # CLI mode
@@ -89,6 +80,6 @@ if __name__ == "__main__":
         # Save result to file
         with open("result.json", "w", encoding="utf-8") as f:
             json.dump(result, f, indent=2, ensure_ascii=False)
-        logger.info(f"Result saved to result.json")
+        logger.info("Result saved to result.json")
     else:
         parser.print_help()
