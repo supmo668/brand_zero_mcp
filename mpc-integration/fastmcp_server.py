@@ -88,27 +88,49 @@ async def get_brand(command: str) -> str:
     
     command: The brand name to analyze
     """
-    result: BrandAnalysisResult = run_workflow(brand_or_product=command)
-    
-    return result.model_dump() if result else {}
-f"""
+    result = run_workflow(brand_or_product=command)
+    try:
+        # Validate and parse as BrandAnalysisResult
+        if not isinstance(result, BrandAnalysisResult):
+            result = BrandAnalysisResult.model_validate(result)
+        mock_data = result.model_dump()
+    except (ValueError, TypeError) as e:
+        return f"Error: Could not parse analysis result as BrandAnalysisResult. Details: {e}"
+
+    # Defensive extraction with defaults for missing keys
+    def get_nested(d, keys, default="N/A"):
+        for k in keys:
+            if isinstance(d, dict) and k in d:
+                d = d[k]
+            else:
+                return default
+        return d
+
+    competitors_str = "\n".join([
+        f"- {comp.get('name', 'N/A')}: {comp.get('market_share', 'N/A')} market share, Brand Score: {comp.get('brand_score', 'N/A')}/100"
+        for comp in mock_data.get('competitors', [])
+    ])
+
+    report = f"""
 Brand Analytics Report:
 ---------------------
-Brand Score: {mock_data['brand_score']}/100
-Visibility Ranking: #{mock_data['visibility_rank']} in industry
-Market Share: {mock_data['market_share']}
+Brand: {mock_data.get('brand_name', 'N/A')}
+Brand Score: {mock_data.get('presence_score', 'N/A')}/100
+Visibility Ranking: #{mock_data.get('visibility_rank', 'N/A')} in industry
+Market Share: {mock_data.get('market_share', 'N/A')}
 
 Social Media Presence:
-- Total Followers: {mock_data['social_media_presence']['followers']}
-- Engagement Rate: {mock_data['social_media_presence']['engagement_rate']}
-- Brand Sentiment: {mock_data['social_media_presence']['sentiment']}
+- Total Followers: {get_nested(mock_data, ['social_media_presence', 'followers'])}
+- Engagement Rate: {get_nested(mock_data, ['social_media_presence', 'engagement_rate'])}
+- Brand Sentiment: {get_nested(mock_data, ['social_media_presence', 'sentiment'])}
 
 Key Metrics:
-- Brand Awareness: {mock_data['key_metrics']['brand_awareness']}
-- Customer Satisfaction: {mock_data['key_metrics']['customer_satisfaction']}
-- Brand Loyalty: {mock_data['key_metrics']['brand_loyalty']}
-- Market Growth: {mock_data['key_metrics']['market_growth']}
+- Brand Awareness: {get_nested(mock_data, ['key_metrics', 'brand_awareness'])}
+- Customer Satisfaction: {get_nested(mock_data, ['key_metrics', 'customer_satisfaction'])}
+- Brand Loyalty: {get_nested(mock_data, ['key_metrics', 'brand_loyalty'])}
+- Market Growth: {get_nested(mock_data, ['key_metrics', 'market_growth'])}
 
 Top Competitors:
-{chr(10).join([f"- {comp['name']}: {comp['market_share']} market share, Brand Score: {comp['brand_score']}/100" for comp in mock_data['competitors']])}
+{competitors_str}
 """
+    return report
