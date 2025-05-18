@@ -64,14 +64,14 @@ async def run_workflow(brand_or_product: str, output_file: str = None, verbose: 
             state = TransformationState(**state)
 
         # Print simulated queries if verbose
-        if verbose:
-            print("\n" + format_simulated_queries(state))
-            print("\n" + format_search_results(state))
+        # if verbose:
+        #     print("\n" + format_simulated_queries(state))
+        #     print("\n" + format_search_results(state))
 
         # Print analysis results
         analysis_result = None
         if state.analysis_result:
-            analysis_result = ensure_brand_analysis_result(state.analysis_result)
+            analysis_result = ensure_brand_analysis_result(state)
             print("\nAnalysis Results:")
             print("=" * 50)
             print(analysis_result.summary)

@@ -1,5 +1,5 @@
-Metadata-Version: 2.1
-Name: uagent-mcp
+Metadata-Version: 2.2
+Name: uagent_mcp
 Version: 0.1.0
 Summary: A library for integrating uAgents with MCP servers
 Author: Your Name
@@ -12,3 +12,11 @@ Classifier: Programming Language :: Python :: 3.8
 Classifier: Programming Language :: Python :: 3.9
 Classifier: Programming Language :: Python :: 3.10
 Requires-Python: >=3.8
+Requires-Dist: uagents>=0.9.0
+Requires-Dist: httpx>=0.23.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

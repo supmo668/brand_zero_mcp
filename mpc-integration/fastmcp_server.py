@@ -79,7 +79,7 @@ class FastMCP:
 
 # Initialize FastMCP server
 mcp = FastMCP("brand")
-from .brandzero_workflow import (
+from brandzero_workflow.run_workflow import (
     run_workflow, BrandAnalysisResult, TransformationState
 )
 @mcp.tool()
