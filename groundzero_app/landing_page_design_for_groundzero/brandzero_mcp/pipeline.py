@@ -11,16 +11,16 @@ from langchain_core.output_parsers import PydanticOutputParser
 import logging
 logger = logging.getLogger("brand_zero.pipeline")
 
-from models import (
+from .models import (
     TransformationState, 
     SimulatedQuery,
     SearchResult,
     BrandAnalysisResult,
     StepStatus
 )
-from llm_service import create_analysis_step
-from llm_providers import OpenAISearchProvider, PerplexitySearchProvider
-from utils import CONFIG, extract_json_from_text, format_sources_for_prompt
+from .llm_service import create_analysis_step
+from .llm_providers import OpenAISearchProvider, PerplexitySearchProvider
+from .utils import CONFIG, extract_json_from_text, format_sources_for_prompt
 
 class QueryListParser(BaseModel):
     """Parser for query list."""

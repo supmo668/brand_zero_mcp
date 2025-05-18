@@ -13,7 +13,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 import logging
 logger = logging.getLogger("brand_zero.llm_providers")
 
-from utils import CONFIG
+from .utils import CONFIG
 
 class BaseSearchProvider:
     """Base class for search providers."""

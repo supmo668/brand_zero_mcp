@@ -45,9 +45,25 @@ class BrandAnalysisResult(BaseModel):
         le=100,  # Score must be less than or equal to 100
         description="Brand presence score out of 100, indicating overall visibility and strength in search results. 0 means no presence, 100 means dominant presence."
     )
+    visibility_rank: Optional[int] = Field(
+        default=None,
+        description="Visibility ranking of the brand in the industry."
+    )
+    market_share: Optional[str] = Field(
+        default=None,
+        description="Market share percentage as a string (e.g., '23.4%')."
+    )
+    social_media_presence: Optional[Dict[str, Any]] = Field(
+        default_factory=dict,
+        description="Social media presence metrics, e.g., followers, engagement_rate, sentiment."
+    )
+    key_metrics: Optional[Dict[str, Any]] = Field(
+        default_factory=dict,
+        description="Key brand metrics such as awareness, satisfaction, loyalty, growth."
+    )
     competitors: List[Dict[str, Any]] = Field(
         default_factory=list,
-        description="List of competitor brands found in search results with their relative presence."
+        description="List of competitor brands found in search results with their relative presence, market share, and brand score."
     )
     sentiment: str = Field(
         default="",

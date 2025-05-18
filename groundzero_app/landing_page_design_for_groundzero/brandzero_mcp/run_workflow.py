@@ -19,8 +19,8 @@ logging.basicConfig(
 logger = logging.getLogger("brand_zero.workflow")
 
 # Import local modules
-from pipeline import run_analysis_pipeline, ensure_brand_analysis_result
-from models import TransformationState, BrandAnalysisResult
+from .pipeline import run_analysis_pipeline, ensure_brand_analysis_result
+from .models import TransformationState, BrandAnalysisResult
 
 def format_simulated_queries(state: TransformationState) -> str:
     """Format simulated queries for display."""
@@ -62,11 +62,6 @@ async def run_workflow(brand_or_product: str, output_file: str = None, verbose: 
         # If state is a dict (LangGraph), convert to TransformationState
         if isinstance(state, dict):
             state = TransformationState(**state)
-
-        # Check for errors
-        if state.error:
-            logger.error("Error in analysis: %s", state.error)
-            return None
 
         # Print simulated queries if verbose
         if verbose:

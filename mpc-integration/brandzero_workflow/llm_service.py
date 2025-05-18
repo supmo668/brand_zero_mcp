@@ -21,8 +21,8 @@ import logging
 logger = logging.getLogger("brand_zero.llm_service")
 
 # Import models and utilities
-from models import TransformationState, StepStatus, IntermediateStep
-from utils import extract_json_from_text, CONFIG
+from .models import TransformationState, StepStatus, IntermediateStep
+from .utils import extract_json_from_text, CONFIG
 
 T = TypeVar('T')
 
