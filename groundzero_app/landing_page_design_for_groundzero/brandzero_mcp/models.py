@@ -39,9 +39,23 @@ class BrandAnalysisResult(BaseModel):
     brand_name: str
     frequency: int
     summary: str
-    competitors: List[Dict[str, Any]] = Field(default_factory=list)
-    sentiment: str
-    recommendations: List[str] = Field(default_factory=list)
+    presence_score: int = Field(
+        default=0,
+        ge=0,  # Score must be greater than or equal to 0
+        le=100,  # Score must be less than or equal to 100
+        description="Brand presence score out of 100, indicating overall visibility and strength in search results. 0 means no presence, 100 means dominant presence."
+    )
+    competitors: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="List of competitor brands found in search results with their relative presence."
+    )
+    sentiment: str = Field(
+        description="Overall consumer sentiment about the brand (positive, negative, neutral, or mixed)."
+    )
+    recommendations: List[str] = Field(
+        default_factory=list,
+        description="Strategic recommendations for improving brand visibility and presence."
+    )
 
 class TransformationState(BaseModel):
     """State object for the reformulation process."""

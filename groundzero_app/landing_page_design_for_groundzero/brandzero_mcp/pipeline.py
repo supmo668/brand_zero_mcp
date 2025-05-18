@@ -173,7 +173,6 @@ async def analyze_results(
     if not result:
         logger.error("Failed to analyze results")
         return None
-    
     # Create analysis result
     # Note: The actual fields would need to be extracted from the markdown
     # For now, we'll create a placeholder with the raw result
@@ -181,6 +180,7 @@ async def analyze_results(
         brand_name=brand_or_product,
         frequency=0,  # This would need to be extracted from the response
         summary=result,
+        presence_score=0,  # This would need to be extracted from the response
         competitors=[],
         sentiment="",
         recommendations=[]

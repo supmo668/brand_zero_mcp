@@ -121,6 +121,12 @@ async def create_analysis_step(
                     step.error = error_msg
                     if state:
                         state.error = error_msg
+                    return Noneif not getattr(state, dep_name):
+                    step.status = StepStatus.ERROR
+                    step.end_time = datetime.now()
+                    step.error = error_msg
+                    if state:
+                        state.error = error_msg
                     return None
 
         # Get system prompt
@@ -158,25 +164,23 @@ async def create_analysis_step(
                 except Exception as parse_error:
                     logger.error(f"Error parsing LLM output: {parse_error}")
                     logger.error(f"Raw output: {llm_output}")
-                    
                     # Try fallback JSON extraction
                     logger.info("Attempting fallback JSON extraction")
                     json_data, raw_text = extract_json_from_text(llm_output)
-                    
                     # Store raw text in state context if available
                     if state and raw_text:
                         if step_name not in state.context:
                             state.context[step_name] = []
                         state.context[step_name].append(raw_text)
                         logger.info(f"Appended raw text to context for step: {step_name}")
-                    
                     if json_data is not None:
                         logger.info(f"Successfully extracted JSON data using fallback method")
-                        # If we have a dict, we can try to create the model directly
                         try:
-                            # Get the expected model from the parser
                             model_class: T = parser.pydantic_object
-                            # Create the model and set the raw_text field if it exists
+                            # If the model expects a 'queries' field and json_data is a list, wrap it
+                            if hasattr(model_class, 'model_fields') and 'queries' in getattr(model_class, 'model_fields', {}):
+                                if isinstance(json_data, list):
+                                    json_data = {"queries": json_data}
                             result = model_class(**json_data)
                             logger.info(f"Successfully created {model_class.__name__} from extracted JSON")
                         except Exception as model_error:
@@ -185,7 +189,6 @@ async def create_analysis_step(
                             logger.error(f"Extracted json_data: {json_data}")
                             result = json_data
                     else:
-                        # If we couldn't extract JSON, log the error and return None
                         logger.error("Failed to extract JSON using fallback method")
                         step.status = StepStatus.ERROR
                         step.end_time = datetime.now()

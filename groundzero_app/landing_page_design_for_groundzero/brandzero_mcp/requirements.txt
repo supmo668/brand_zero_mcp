@@ -8,5 +8,6 @@ langchain>=0.0.239
 langchain-core>=0.1.0
 langchain-openai>=0.0.2
 langchain-perplexity>=0.0.1
-mcp>=0.0.31
+# fastmcp - Install from GitHub repo
+git+https://github.com/jlowin/fastmcp.git
 httpx>=0.24.0
